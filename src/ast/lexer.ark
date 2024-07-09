@@ -1,0 +1,103 @@
+(mut fileContent "")
+(mut index 0)
+(mut current "")
+
+(let keywords [
+  "if" "return" "print" "for" "while"
+])
+
+(let numbers [
+  0 1 2 3 4 5 6 7 8 9
+])
+
+(let alpha [
+  "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m"
+  "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"
+])
+
+(let isNumber (fun (_string) {
+  (mut _output false)
+  (mut _index 0)
+
+  (while (< _index (len numbers)) {
+    (if (= (@ numbers _index) (toNumber _string)) {
+      (set _output true)
+    })
+    (set _index (+ 1 _index))
+  })
+
+  _output  
+}))
+
+(let isAlpha (fun (_string) {
+  (mut _output false)
+  (mut _index 0)
+  
+  (while (< _index (len alpha)) {
+    (if (= (@ alpha _index) _string) {
+      (set _output true)
+    })
+    (set _index (+ 1 _index))
+  })
+  
+  _output
+}))
+
+(let next (fun () {
+  (mut _output "")
+  
+  (if (< (+ 1 index) (len fileContent)) {
+    (set index (+ 1 index))
+    (set current (@ fileContent (- index 1)))
+    (set _output (@ fileContent index))
+  }(set current ""))
+  
+  _output
+}))
+
+(let isKeyword? (fun (_string) {
+  (mut _output false)
+  
+  (if (= (type _string) "String") {
+    (mut _index 0)
+    (while (< _index (len keywords)) {
+      (if (= (@ keywords _index) _string) {
+        (set _output true)})
+      (set _index (+ 1 _index))
+    })
+  })
+  
+  _output
+}))
+
+(let genKeyword (fun () {
+  (mut buffer "")
+  
+  (while (= (isAlpha current) true) {
+    (set buffer (+ buffer current))
+    (next)
+  })
+  
+  buffer
+}))
+
+(let tokenize (fun (file_path) {
+  (assert (= (type file_path) "String") "file_path needs to be a String.")
+  (assert (io:fileExists? file_path) "file not found.")
+
+  (set fileContent (io:readFile file_path))
+  (mut tokens [])
+  (mut i 0)
+  (mut buffer "")
+
+  (while (!= i (len fileContent)) {
+    (mut b (genKeyword))
+    (if (= (isKeyword? b) true) {
+      (print b ": true")
+    })
+    (next)
+    (set i (+ 1 i))
+  })
+
+  tokens 
+}))
