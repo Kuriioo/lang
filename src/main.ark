@@ -1,4 +1,4 @@
 (import ast.lexer)
 
-(let tokens (tokenize "example/main.jsp"))
-#(print tokens)
+(let tokens (tokenize "example/main.lang"))
+(print tokens)

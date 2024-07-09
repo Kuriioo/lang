@@ -1,9 +1,17 @@
+(import ast.parser)
+
 (mut fileContent "")
 (mut index 0)
 (mut current "")
 
 (let keywords [
-  "if" "return" "print" "for" "while"
+  "if" "return" "switch" "for" "while"
+  "class" "public" "private"
+])
+
+(let ope [
+  ";" "{" "}" "[" "]" "(" ")"
+  "=" "-" "*" "/"
 ])
 
 (let numbers [
@@ -70,6 +78,18 @@
   _output
 }))
 
+(let getOpe (fun () {
+  (mut _index 0)
+  (mut tok nil)
+  (while (< _index (len ope)) {
+    (if (= (@ ope _index) current) {
+      (set tok (newToken "" current))
+    })
+    (set _index (+ 1 _index))
+  })
+  tok
+}))
+
 (let genKeyword (fun () {
   (mut buffer "")
   
@@ -91,9 +111,13 @@
   (mut buffer "")
 
   (while (!= i (len fileContent)) {
+    (mut opeTok (getOpe))
+    (if (!= opeTok nil) {
+      (set tokens (append tokens opeTok))
+    })
     (mut b (genKeyword))
     (if (= (isKeyword? b) true) {
-      (print b ": true")
+      (set tokens (append tokens (newToken "Keyword" b)))
     })
     (next)
     (set i (+ 1 i))

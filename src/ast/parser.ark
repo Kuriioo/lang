@@ -1,0 +1,3 @@
+(let newToken (fun (name value) {
+  (fun (&name &value) ())
+}))
