@@ -5,11 +5,6 @@ private enum TestEnum {
   NO
 }
 
-public class Main {
-  private static String h = "Hello, World!";
-
-  public void main(String[] args) {
-    print(Lang.hello);
-  }
-
+public void main(String[] args) {
+  print(Lang.hello);
 }
