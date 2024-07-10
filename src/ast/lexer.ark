@@ -6,12 +6,14 @@
 
 (let keywords [
   "if" "return" "switch" "for" "while"
-  "class" "public" "private"
+  "class" "public" "private" "static"
+  "import" "enum" "extends" "implements"
+  "null" "false" "true" "else" "break"
 ])
 
 (let ope [
   ";" "{" "}" "[" "]" "(" ")"
-  "=" "-" "*" "/"
+  "=" "-" "*" "/" "\"" "'"
 ])
 
 (let numbers [
@@ -21,6 +23,8 @@
 (let alpha [
   "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m"
   "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"
+  "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M"
+  "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"
 ])
 
 (let isNumber (fun (_string) {
@@ -81,12 +85,14 @@
 (let getOpe (fun () {
   (mut _index 0)
   (mut tok nil)
+
   (while (< _index (len ope)) {
     (if (= (@ ope _index) current) {
       (set tok (newToken "" current))
     })
     (set _index (+ 1 _index))
   })
+
   tok
 }))
 
@@ -118,6 +124,10 @@
     (mut b (genKeyword))
     (if (= (isKeyword? b) true) {
       (set tokens (append tokens (newToken "Keyword" b)))
+    }{
+      (if (!= b "") {
+        (set tokens (append tokens (newToken "Identifier" b)))
+      })
     })
     (next)
     (set i (+ 1 i))

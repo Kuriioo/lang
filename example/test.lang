@@ -1,0 +1,5 @@
+public class Lang {
+
+  public static String hello = "Hello, world!";
+ 
+}

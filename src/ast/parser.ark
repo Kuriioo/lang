@@ -1,3 +1,8 @@
 (let newToken (fun (name value) {
   (fun (&name &value) ())
 }))
+
+(let parse (fun (_tokens) {
+  (mut _output [])
+  _output
+}))

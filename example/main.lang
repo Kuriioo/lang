@@ -1,5 +1,15 @@
+import "test.lang"
+
+private enum TestEnum {
+  YES,
+  NO
+}
+
 public class Main {
-  public int main(String[] args) {
-    return 0;
+  private static String h = "Hello, World!";
+
+  public void main(String[] args) {
+    print(Lang.hello);
   }
+
 }

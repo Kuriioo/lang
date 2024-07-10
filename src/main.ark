@@ -1,4 +1,10 @@
 (import ast.lexer)
+(import ast.parser)
 
-(let tokens (tokenize "example/main.lang"))
-(print tokens)
+(let main (fun () {
+  (let tokens (tokenize "example/main.lang"))
+  (print tokens)
+  (let t (parse tokens))
+}))
+
+(main)
