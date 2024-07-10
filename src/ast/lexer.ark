@@ -67,7 +67,7 @@
   _output
 }))
 
-(let isKeyword? (fun (_string) {
+(let isKeyword (fun (_string) {
   (mut _output false)
   
   (if (= (type _string) "String") {
@@ -82,29 +82,32 @@
   _output
 }))
 
-(let getOpe (fun () {
-  (mut _index 0)
-  (mut tok nil)
-
-  (while (< _index (len ope)) {
-    (if (= (@ ope _index) current) {
-      (set tok (newToken "" current))
-    })
-    (set _index (+ 1 _index))
-  })
-
-  tok
-}))
-
-(let genKeyword (fun () {
+(let getTokens(fun () {
   (mut buffer "")
-  
+  (mut tokens [])
+
   (while (= (isAlpha current) true) {
     (set buffer (+ buffer current))
     (next)
   })
+
+  (if (= (isKeyword buffer) true) {
+    (set tokens (append tokens (newToken "Keyword" buffer)))
+  }{
+    (if (!= buffer ""){
+      (set tokens (append tokens (newToken "Identifier" buffer)))
+    })
+  })  
+
+  (mut _index 0)
+  (while (< _index (len ope)) {
+    (if (= (@ ope _index) current) {
+      (set tokens (append tokens (newToken "Operator" current)))
+    })
+    (set _index (+ 1 _index))
+  })
   
-  buffer
+  tokens
 }))
 
 (let tokenize (fun (file_path) {
@@ -117,18 +120,12 @@
   (mut buffer "")
 
   (while (!= i (len fileContent)) {
-    (mut opeTok (getOpe))
-    (if (!= opeTok nil) {
-      (set tokens (append tokens opeTok))
+    (mut tok (getTokens))
+    
+    (if (!= (len tok) 0) {
+      (set tokens (append tokens tok))
     })
-    (mut b (genKeyword))
-    (if (= (isKeyword? b) true) {
-      (set tokens (append tokens (newToken "Keyword" b)))
-    }{
-      (if (!= b "") {
-        (set tokens (append tokens (newToken "Identifier" b)))
-      })
-    })
+    
     (next)
     (set i (+ 1 i))
   })
