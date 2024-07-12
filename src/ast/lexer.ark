@@ -4,35 +4,43 @@
 (mut index 0)
 (mut current "")
 
-(let keywords [
+(let keywords
+[
   "if" "return" "switch" "for" "while"
   "class" "public" "private" "static"
   "import" "enum" "extends" "implements"
   "null" "false" "true" "else" "break"
 ])
 
-(let ope [
+(let ope
+[
   ";" "{" "}" "[" "]" "(" ")"
-  "=" "-" "*" "/" "\"" "'"
+  "=" "-" "*" "/" "\"" "'" ","
+  "<" ">" "\\" "." "?" ":" "|" "_"
+  "!" "@" "#" "$" "%" "^" "&" "+"
 ])
 
-(let numbers [
+(let numbers
+[
   0 1 2 3 4 5 6 7 8 9
 ])
 
-(let alpha [
+(let alpha
+[
   "a" "b" "c" "d" "e" "f" "g" "h" "i" "j" "k" "l" "m"
   "n" "o" "p" "q" "r" "s" "t" "u" "v" "w" "x" "y" "z"
   "A" "B" "C" "D" "E" "F" "G" "H" "I" "J" "K" "L" "M"
   "N" "O" "P" "Q" "R" "S" "T" "U" "V" "W" "X" "Y" "Z"
 ])
 
-(let isNumber (fun (_string) {
+(let isNumber (fun (_string)
+{
   (mut _output false)
   (mut _index 0)
 
   (while (< _index (len numbers)) {
-    (if (= (@ numbers _index) (toNumber _string)) {
+    (if (= (@ numbers _index) (toNumber _string))
+    {
       (set _output true)
     })
     (set _index (+ 1 _index))
@@ -41,12 +49,15 @@
   _output  
 }))
 
-(let isAlpha (fun (_string) {
+(let isAlpha (fun (_string)
+{
   (mut _output false)
   (mut _index 0)
   
-  (while (< _index (len alpha)) {
-    (if (= (@ alpha _index) _string) {
+  (while (< _index (len alpha))
+  {
+    (if (= (@ alpha _index) _string)
+    {
       (set _output true)
     })
     (set _index (+ 1 _index))
@@ -55,62 +66,84 @@
   _output
 }))
 
-(let next (fun () {
+(let next (fun ()
+{
   (mut _output "")
   
-  (if (< (+ 1 index) (len fileContent)) {
-    (set index (+ 1 index))
-    (set current (@ fileContent (- index 1)))
+  (if (< index (len fileContent))
+  {
+    (set current (@ fileContent index))
     (set _output (@ fileContent index))
-  }(set current ""))
+    (set index (+ 1 index))
+  }
+  (set current ""))
   
   _output
 }))
 
-(let isKeyword (fun (_string) {
+(let strContains (fun (_string _e) 
+{
   (mut _output false)
-  
-  (if (= (type _string) "String") {
-    (mut _index 0)
-    (while (< _index (len keywords)) {
-      (if (= (@ keywords _index) _string) {
-        (set _output true)})
-      (set _index (+ 1 _index))
+  (if (= (type _e) "String")
+  {
+    (mut i 0)
+    (while (< i (len _string))
+    {
+      (if (= (@ _string i) _e)
+      (set _output true))
+    })
+  }
+  {
+    (if (= (type _e) "List")
+    {
+      (mut i 0)
+      (while (< i (len _string))
+      {
+        (mut i2 0)
+        (while (< i2 (len _e))
+        {
+          (if (= (@ _e i2) (@ _string i))
+          {
+            (set _output true)
+          })
+          (set i2 (+ 1 i2))
+        })
+        (set i (+ 1 i))
+      })
     })
   })
-  
   _output
 }))
 
-(let getTokens(fun () {
+(let getTokens(fun ()
+{
   (mut buffer "")
   (mut tokens [])
 
-  (while (= (isAlpha current) true) {
+  (while (and (and (and (!= (strContains current ope) true) (!= 1 2)) (!= current "\n") (< index (len fileContent))) (!= current " ") (!= current "\t"))
+  {
     (set buffer (+ buffer current))
     (next)
   })
 
-  (if (= (isKeyword buffer) true) {
-    (set tokens (append tokens (newToken "Keyword" buffer)))
-  }{
-    (if (!= buffer ""){
-      (set tokens (append tokens (newToken "Identifier" buffer)))
-    })
-  })  
-
-  (mut _index 0)
-  (while (< _index (len ope)) {
-    (if (= (@ ope _index) current) {
-      (set tokens (append tokens (newToken "Operator" current)))
-    })
-    (set _index (+ 1 _index))
+  (if (!= buffer "") 
+  {
+    (set tokens (append tokens buffer))
+    (set buffer "")
   })
-  
+
+  (if (= (strContains current ope) true)
+  {
+    (set tokens (append tokens current))
+  })
+
+  (set buffer "")
+
   tokens
 }))
 
-(let tokenize (fun (file_path) {
+(let tokenize (fun (file_path) 
+{
   (assert (= (type file_path) "String") "file_path needs to be a String.")
   (assert (io:fileExists? file_path) "file not found.")
 
@@ -119,11 +152,18 @@
   (mut i 0)
   (mut buffer "")
 
-  (while (!= i (len fileContent)) {
+  (while (!= (- i 1) (len fileContent))
+  {
     (mut tok (getTokens))
-    
-    (if (!= (len tok) 0) {
-      (set tokens (append tokens tok))
+
+    (if (!= (len tok) 0)
+    {
+      (mut i2 0)
+      (while (< i2 (len tok))
+      {
+        (set tokens (append tokens (@ tok i2)))
+        (set i2 (+ 1 i2))
+      })
     })
     
     (next)
