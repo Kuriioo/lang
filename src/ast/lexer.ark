@@ -1,5 +1,3 @@
-(import ast.parser)
-
 (mut fileContent "")
 (mut index 0)
 (mut current "")
